@@ -1,0 +1,8 @@
+@import "tailwindcss";
+
+/* Minimal global tweaks */
+html, body { height: 100%; }
+body { font-feature-settings: 'cv02','cv03','cv04','cv11'; }
+
+/* Utility overrides (keep minimal per instructions) */
+.line-clamp-2 { display: -webkit-box; -webkit-line-clamp: 2; line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
