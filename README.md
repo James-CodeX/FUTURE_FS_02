@@ -2,6 +2,8 @@
 
 A full‑stack Next.js app that implements the Future Interns “Mini E‑Commerce Storefront” task with SSR pages, a shopping cart, checkout, authentication, order history, and an admin dashboard.
 
+[Live](https://future-onestopshop.netlify.app/)
+
 ![App Screenshot](./public/screenshot.png)
 
 ## ✅ Task Coverage
