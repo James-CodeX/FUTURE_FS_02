@@ -22,6 +22,10 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "OneStopStore — Mini E‑Commerce",
   description: "OneStopStore — a minimal e‑commerce demo built with Next.js and FakeStore API",
+  icons: {
+    icon: '/fi_logo.png',
+    shortcut: '/fi_logo.png',
+  },
 };
 
 export default async function RootLayout({
