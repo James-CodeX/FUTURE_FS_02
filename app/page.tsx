@@ -12,6 +12,33 @@ export default async function Home({
 }) {
   const sp = await searchParams;
   const products = await getProducts();
+
+  // If no products were fetched (API error), show a friendly message
+  if (!products.length) {
+    const qRaw = sp.q;
+    const q = (Array.isArray(qRaw) ? qRaw[0] : qRaw || "").toLowerCase();
+
+    // Only show error if not searching (search might legitimately return no results)
+    if (!q) {
+      return (
+        <div className="space-y-6">
+          <div className="rounded-xl bg-white p-8 shadow-sm text-center">
+            <h2 className="text-xl font-bold mb-4">Unable to load products</h2>
+            <p className="text-sm text-zinc-600 mb-4">
+              We&apos;re having trouble connecting to our product catalog. Please try again later.
+            </p>
+            <a
+              href="/"
+              className="inline-flex items-center justify-center rounded-md bg-sky-600 px-4 py-2 text-sm font-semibold text-white hover:bg-sky-700"
+            >
+              Refresh page
+            </a>
+          </div>
+        </div>
+      );
+    }
+  }
+
   const qRaw = sp.q;
   const catRaw = sp.cat;
   const q = (Array.isArray(qRaw) ? qRaw[0] : qRaw || "").toLowerCase();
