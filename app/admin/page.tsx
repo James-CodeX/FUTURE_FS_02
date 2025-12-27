@@ -4,13 +4,45 @@ import { redirect } from 'next/navigation';
 import FulfillButton from './FulfillButton';
 
 export default async function AdminPage() {
-  const session = await getSessionFromCookies();
+  let session = null;
+  try {
+    session = await getSessionFromCookies();
+  } catch (error) {
+    console.error('Failed to get session:', error);
+  }
   // If not authenticated, send to login and return here after
   if (!session) redirect('/login?redirect=/admin');
   // If authenticated but not an admin, block access
   if (session.role !== 'ADMIN') redirect('/');
-  const users = await prisma.user.findMany({ select: { id: true, email: true, username: true, role: true, createdAt: true } });
-  const orders = await prisma.order.findMany({ include: { items: true, user: { select: { username: true } } }, orderBy: { createdAt: 'desc' }, take: 50 });
+
+  let users: Array<{ id: number; email: string; username: string; role: string; createdAt: Date }> = [];
+  let orders: Array<any> = [];
+  let hasError = false;
+
+  try {
+    users = await prisma.user.findMany({ select: { id: true, email: true, username: true, role: true, createdAt: true } });
+    orders = await prisma.order.findMany({ include: { items: true, user: { select: { username: true } } }, orderBy: { createdAt: 'desc' }, take: 50 });
+  } catch (error) {
+    console.error('Failed to fetch admin data:', error);
+    hasError = true;
+  }
+
+  if (hasError) {
+    return (
+      <div className="space-y-8">
+        <h1 className="text-2xl font-bold">Admin Dashboard</h1>
+        <div className="rounded-lg border border-amber-200 bg-amber-50 p-4">
+          <p className="text-sm text-amber-800">
+            Unable to load admin data. Please try again later or contact support if the issue persists.
+          </p>
+          <a href="/admin" className="mt-3 inline-flex items-center justify-center rounded-md bg-amber-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-amber-700">
+            Retry
+          </a>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-8">
       <h1 className="text-2xl font-bold">Admin Dashboard</h1>

@@ -31,7 +31,13 @@ export const metadata: Metadata = {
 export default async function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
-  const session = await getSessionFromCookies();
+  // Safely get session - return null if there's any error
+  let session = null;
+  try {
+    session = await getSessionFromCookies();
+  } catch (error) {
+    console.error('Failed to get session from cookies:', error);
+  }
   return (
     <html lang="en">
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
