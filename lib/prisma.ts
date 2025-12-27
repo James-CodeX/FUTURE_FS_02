@@ -4,4 +4,6 @@ const globalForPrisma = global as unknown as { prisma: PrismaClient | undefined 
 
 export const prisma = globalForPrisma.prisma ?? new PrismaClient();
 
-if (process.env.NODE_ENV !== 'production') globalForPrisma.prisma = prisma;
+// Cache Prisma client globally in both development and production
+// This prevents multiple PrismaClient instances and connection pool exhaustion
+globalForPrisma.prisma = prisma;
