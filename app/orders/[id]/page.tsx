@@ -3,10 +3,23 @@ import { prisma } from '../../../lib/prisma';
 import { getSessionFromCookies } from '../../../lib/auth';
 
 export default async function OrderDetail({ params }: { params: Promise<{ id: string }> }) {
-  const session = await getSessionFromCookies();
+  let session = null;
+  try {
+    session = await getSessionFromCookies();
+  } catch (error) {
+    console.error('Failed to get session:', error);
+  }
   if (!session) notFound();
+
   const { id } = await params;
-  const order = await prisma.order.findUnique({ where: { id: Number(id) }, include: { items: true } });
+
+  let order = null;
+  try {
+    order = await prisma.order.findUnique({ where: { id: Number(id) }, include: { items: true } });
+  } catch (error) {
+    console.error('Failed to fetch order:', error);
+  }
+
   if (!order || (order.userId !== session.id && session.role !== 'ADMIN')) notFound();
   return (
     <div className="space-y-4">

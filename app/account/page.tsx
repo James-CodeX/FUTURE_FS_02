@@ -5,7 +5,13 @@ import Link from 'next/link';
 export const dynamic = 'force-dynamic';
 
 export default async function AccountPage() {
-  const session = await getSessionFromCookies();
+  let session = null;
+  try {
+    session = await getSessionFromCookies();
+  } catch (error) {
+    console.error('Failed to get session:', error);
+  }
+
   if (!session) {
     return (
       <div className="space-y-3">
@@ -14,8 +20,34 @@ export default async function AccountPage() {
       </div>
     );
   }
-  const user = await prisma.user.findUnique({ where: { id: session.id }, select: { id: true, email: true, username: true, role: true, name: true, createdAt: true } });
-  const orderCount = await prisma.order.count({ where: { userId: session.id } });
+
+  let user = null;
+  let orderCount = 0;
+  let hasError = false;
+
+  try {
+    user = await prisma.user.findUnique({ where: { id: session.id }, select: { id: true, email: true, username: true, role: true, name: true, createdAt: true } });
+    orderCount = await prisma.order.count({ where: { userId: session.id } });
+  } catch (error) {
+    console.error('Failed to fetch account data:', error);
+    hasError = true;
+  }
+
+  if (hasError || !user) {
+    return (
+      <div className="space-y-6">
+        <h2 className="text-xl font-semibold">Your Account</h2>
+        <div className="rounded-lg border border-amber-200 bg-amber-50 p-4">
+          <p className="text-sm text-amber-800">
+            Unable to load account information. Please try again later.
+          </p>
+          <a href="/account" className="mt-3 inline-flex items-center justify-center rounded-md bg-amber-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-amber-700">
+            Retry
+          </a>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
